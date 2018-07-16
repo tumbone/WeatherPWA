@@ -1,1 +1,1 @@
-# Weather Web App - PWA
+# Weather PWA
