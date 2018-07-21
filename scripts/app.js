@@ -68,6 +68,25 @@
 
   /*****************************************************************************
    *
+   * Methods to open the indexed db
+   *
+   ****************************************************************************/
+  function openDatabase() {
+    if (!'serviceWorker' in navigator) {
+      return Promise.resolve();
+    }
+
+    return idb.open('weather-app-db', 1, function (upgradeDb) {
+      var store = upgradeDb.createObjectStore('selectedCities', { keyPath: 'key' });
+      store.createIndex('label', 'label');
+    });
+
+  }
+  app._dbPromise = openDatabase();
+
+
+  /*****************************************************************************
+   *
    * Methods to update/refresh the UI
    *
    ****************************************************************************/
@@ -221,8 +240,19 @@
   // TODO add saveSelectedCities function here
   // Save list of cities to localStorage.
   app.saveSelectedCities = function () {
-    var selectedCities = JSON.stringify(app.selectedCities);
-    localStorage.selectedCities = selectedCities;
+    // var selectedCities = JSON.stringify(app.selectedCities);
+    // localStorage.selectedCities = selectedCities;
+
+    app._dbPromise.then(function (db) {
+      var tx = db.transaction('selectedCities', 'readwrite');
+      var selCitiesStore = tx.objectStore('selectedCities');
+      app.selectedCities.forEach(function (city) {
+        selCitiesStore.put(city);
+      })
+      return tx.complete;
+    }).then(function () {
+      console.log('Cities added!')
+    });
   };
 
   app.getIconClass = function (weatherCode) {
@@ -333,24 +363,45 @@
   // app.updateForecastCard(initialWeatherForecast);
 
   // TODO add startup code here
-  app.selectedCities = localStorage.selectedCities;
-  if (app.selectedCities) {
-    app.selectedCities = JSON.parse(app.selectedCities);
-    app.selectedCities.forEach(function (city) {
-      app.getForecast(city.key, city.label);
-    });
-  } else {
-    /* The user is using the app for the first time, or the user has not
-     * saved any cities, so show the user some fake data. A real app in this
-     * scenario could guess the user's location via IP lookup and then inject
-     * that data into the page.
-     */
-    app.updateForecastCard(initialWeatherForecast);
-    app.selectedCities = [
-      { key: initialWeatherForecast.key, label: initialWeatherForecast.label }
-    ];
-    app.saveSelectedCities();
-  }
+  // app.selectedCities = localStorage.selectedCities;
+
+
+  app._dbPromise.then(function (db) {
+    var tx = db.transaction('selectedCities');
+    var selCitiesStore = tx.objectStore('selectedCities');
+    var keyIndex = selCitiesStore.index('label');
+    return keyIndex.getAll();
+  }).then(function (cities) {
+    if (cities.length > 0) {
+      cities.forEach(function (city) {
+        app.getForecast(city.key, city.label);
+      });
+    } else {
+      app.updateForecastCard(initialWeatherForecast);
+      app.selectedCities = [
+        { key: initialWeatherForecast.key, label: initialWeatherForecast.label }
+      ];
+      app.saveSelectedCities();
+    }
+  });
+
+  // if (app.selectedCities) {
+  //   app.selectedCities = JSON.parse(app.selectedCities);
+  //   app.selectedCities.forEach(function (city) {
+  //     app.getForecast(city.key, city.label);
+  //   });
+  // } else {
+  //   /* The user is using the app for the first time, or the user has not
+  //    * saved any cities, so show the user some fake data. A real app in this
+  //    * scenario could guess the user's location via IP lookup and then inject
+  //    * that data into the page.
+  //    */
+  //   app.updateForecastCard(initialWeatherForecast);
+  //   app.selectedCities = [
+  //     { key: initialWeatherForecast.key, label: initialWeatherForecast.label }
+  //   ];
+  //   app.saveSelectedCities();
+  // }
 
   // Service worker registration
   if ('serviceWorker' in navigator) {
