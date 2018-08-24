@@ -12,9 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 (function () {
   'use strict'
-
+  const stateService = new State();
+  console.log('isLoading:', stateService.isLoading);
+  stateService.isLoading = false;
+  console.log('isLoading 2:', stateService.isLoading);
   var app = {
     isLoading: true,
     visibleCards: {},
