@@ -2,7 +2,8 @@ class MainController {
   constructor() {
     this.state = new StateService();
     this.dbPromise = DbService.openDatabase();
-    this.forecastOrchestrator = new ForcastOrchastrator();
+    // this.forecastOrchestrator = new ForecastOrchestrator();
+    this.value = "Main controller here";
   }
   static registerSW() {
     if ('serviceWorker' in navigator) {
@@ -13,24 +14,26 @@ class MainController {
         })
     }
   }
-  static startUp() {
+  startUp() {
+    const MainController = this;
     this.dbPromise.then(function (db) {
       const tx = db.transaction('selectedCities');
       const selCitiesStore = tx.objectStore('selectedCities');
       const keyIndex = selCitiesStore.index('label');
       return keyIndex.getAll();
     }).then(function (cities) {
+      const forecastOrchestrator = new ForecastOrchestrator();
       if (cities.length > 0) {
         cities.forEach(function (city) {
           forecastOrchestrator.getForecast(city.key, city.label);
         });
       } else {
-        forecastOrchastrator.updateForecastCard(initialWeatherForecast);
-        this.state.selectedCities = [
-          { key: initialWeatherForecast.key, label: initialWeatherForecast.label }
+        forecastOrchestrator.updateForecastCard(MainController.state.initialWeatherForecast);
+        StateService.selectedCities = [
+          { key: MainController.state.initialWeatherForecast.key, label: MainController.state.initialWeatherForecast.label }
         ];
-        this.state.saveSelectedCities();
+        MainController.state.saveSelectedCities(MainController.dbPromise);
       }
     });
   }
-}
+} 

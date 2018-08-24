@@ -17,6 +17,8 @@
   'use strict'
   // const stateService = new StateService();
   MainController.registerSW();
+  const App = new MainController();
+  App.startUp();
 
   var app = {
     isLoading: true,
@@ -369,24 +371,24 @@
   // app.selectedCities = localStorage.selectedCities;
 
 
-  app._dbPromise.then(function (db) {
-    var tx = db.transaction('selectedCities');
-    var selCitiesStore = tx.objectStore('selectedCities');
-    var keyIndex = selCitiesStore.index('label');
-    return keyIndex.getAll();
-  }).then(function (cities) {
-    if (cities.length > 0) {
-      cities.forEach(function (city) {
-        app.getForecast(city.key, city.label);
-      });
-    } else {
-      app.updateForecastCard(initialWeatherForecast);
-      app.selectedCities = [
-        { key: initialWeatherForecast.key, label: initialWeatherForecast.label }
-      ];
-      app.saveSelectedCities();
-    }
-  });
+  // app._dbPromise.then(function (db) {
+  //   var tx = db.transaction('selectedCities');
+  //   var selCitiesStore = tx.objectStore('selectedCities');
+  //   var keyIndex = selCitiesStore.index('label');
+  //   return keyIndex.getAll();
+  // }).then(function (cities) {
+  //   if (cities.length > 0) {
+  //     cities.forEach(function (city) {
+  //       app.getForecast(city.key, city.label);
+  //     });
+  //   } else {
+  //     app.updateForecastCard(initialWeatherForecast);
+  //     app.selectedCities = [
+  //       { key: initialWeatherForecast.key, label: initialWeatherForecast.label }
+  //     ];
+  //     app.saveSelectedCities();
+  //   }
+  // });
 
   // if (app.selectedCities) {
   //   app.selectedCities = JSON.parse(app.selectedCities);
