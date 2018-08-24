@@ -29,11 +29,24 @@ class MainController {
         });
       } else {
         forecastOrchestrator.updateForecastCard(MainController.state.initialWeatherForecast);
-        StateService.selectedCities = [
+        MainController.state.selectedCities = [
           { key: MainController.state.initialWeatherForecast.key, label: MainController.state.initialWeatherForecast.label }
         ];
-        MainController.state.saveSelectedCities(MainController.dbPromise);
+        MainController.saveSelectedCities(MainController.dbPromise);
       }
+    });
+  }
+  saveSelectedCities() {
+    const MainController = this;
+    this.dbPromise.then(function (db) {
+      const tx = db.transaction('selectedCities', 'readwrite');
+      const selCitiesStore = tx.objectStore('selectedCities');
+      MainController.state.selectedCities.forEach(function (city) {
+        selCitiesStore.put(city);
+      })
+      return tx.complete;
+    }).then(function () {
+      console.log('Cities added!')
     });
   }
 } 

@@ -108,20 +108,4 @@ class StateService {
         return 'partly-cloudy-day';
     }
   }
-  setSelectedCities(cities) {
-    this.selectedCities = cities;
-  }
-  saveSelectedCities(dbPromise) {
-    const stateService = this;
-    dbPromise.then(function (db) {
-      const tx = db.transaction('selectedCities', 'readwrite');
-      const selCitiesStore = tx.objectStore('selectedCities');
-      stateService.selectedCities.forEach(function (city) {
-        selCitiesStore.put(city);
-      })
-      return tx.complete;
-    }).then(function () {
-      console.log('Cities added!')
-    });
-  }
 }
