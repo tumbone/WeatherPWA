@@ -16,7 +16,7 @@ class ForecastOrchestrator {
        * data. If the service worker has the data, then display the cached
        * data while the app fetches the latest data.
        */
-      caches.match(url).then(function (response) {
+      caches.match(url).then((response) => {
         if (response) {
           response.json().then(function updateFromCache(json) {
             const results = json.query.results;
@@ -31,7 +31,7 @@ class ForecastOrchestrator {
 
     // Fetch the latest data.
     const request = new XMLHttpRequest();
-    request.onreadystatechange = function () {
+    request.onreadystatechange = () => {
       if (request.readyState === XMLHttpRequest.DONE) {
         if (request.status === 200) {
           const response = JSON.parse(request.response);
@@ -55,8 +55,6 @@ class ForecastOrchestrator {
   updateForecasts() {
     const ForecastOrchestrator = this;
     const keys = Object.keys(this.StateService.visibleCards);
-    keys.forEach(function (key) {
-      ForecastOrchestrator.getForecast(key);
-    });
+    keys.forEach((key) => ForecastOrchestrator.getForecast(key));
   };
 }

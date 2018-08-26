@@ -12,24 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-(function () {
+(() => {
   'use strict'
   const App = new MainController();
   App.registerSW();
   App.startUp();
 
-
-  document.getElementById('butRefresh').addEventListener('click', function () {
-    // Refresh all of the forecasts
-    App.forecastOrchestrator.updateForecasts();
-  });
-  document.getElementById('butAdd').addEventListener('click', function () {
-    // Open/show the add new city dialog
-    App.toggleAddDialog(true);
-  });
-  document.getElementById('butAddCity').addEventListener('click', function () {
-    // Add the newly selected city
+  // Refresh all of the forecasts
+  document.getElementById('butRefresh').addEventListener('click', () => App.forecastOrchestrator.updateForecasts());
+  // Open/show the add new city dialog
+  document.getElementById('butAdd').addEventListener('click', () => App.toggleAddDialog(true));
+  // Add the newly selected city
+  document.getElementById('butAddCity').addEventListener('click', () => {
     const select = document.getElementById('selectCityToAdd');
     const selected = select.options[select.selectedIndex];
     const key = selected.value;
@@ -44,9 +38,7 @@
     App.saveSelectedCities();
     App.toggleAddDialog(false);
   });
-  document.getElementById('butAddCancel').addEventListener('click', function () {
-    // Close the add new city dialog
-    App.toggleAddDialog(false);
-  });
+  // Close the add new city dialog
+  document.getElementById('butAddCancel').addEventListener('click', () => App.toggleAddDialog(false));
 
 })();

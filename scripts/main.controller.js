@@ -15,14 +15,14 @@ class MainController {
   }
   startUp() {
     const MainController = this;
-    this.dbPromise.then(function (db) {
+    this.dbPromise.then((db) => {
       const tx = db.transaction('selectedCities');
       const selCitiesStore = tx.objectStore('selectedCities');
       const keyIndex = selCitiesStore.index('label');
       return keyIndex.getAll();
-    }).then(function (cities) {
+    }).then((cities) => {
       if (cities.length > 0) {
-        cities.forEach(function (city) {
+        cities.forEach((city) => {
           MainController.forecastOrchestrator.getForecast(city.key, city.label, MainController.state.initialWeatherForecast);
         });
       } else {
@@ -36,25 +36,19 @@ class MainController {
   }
   saveSelectedCities() {
     const MainController = this;
-    this.dbPromise.then(function (db) {
+    this.dbPromise.then((db) => {
       const tx = db.transaction('selectedCities', 'readwrite');
       const selCitiesStore = tx.objectStore('selectedCities');
       MainController.state.selectedCities.forEach(function (city) {
         selCitiesStore.put(city);
       })
       return tx.complete;
-    }).then(function () {
-      console.log('Cities added!')
-    });
+    }).then(() => console.log('Cities added!'));
   }
   // Toggles the visibility of the add new city dialog.
   toggleAddDialog(visible) {
-    if (visible) {
-      this.state.addDialog.classList.add('dialog-container--visible');
-    } else {
-      this.state.addDialog.classList.remove('dialog-container--visible');
-    }
-  };
+    visible ? this.state.addDialog.classList.add('dialog-container--visible') : this.state.addDialog.classList.remove('dialog-container--visible');
+  }
 
 
 
