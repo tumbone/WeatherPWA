@@ -4,9 +4,10 @@ class ForecastOrchestrator {
     this.viewService = new ViewService();
   }
 
-  getForecast(key, label) {
-    var statement = 'select * from weather.forecast where woeid=' + key;
-    var url = 'https://query.yahooapis.com/v1/public/yql?format=json&q=' +
+  getForecast(key, label, initialWeatherForecast) {
+    const ForecastOrchestrator = this;
+    const statement = 'select * from weather.forecast where woeid=' + key;
+    const url = 'https://query.yahooapis.com/v1/public/yql?format=json&q=' +
       statement;
     // TODO add cache logic here
     if ('caches' in window) {
@@ -18,11 +19,11 @@ class ForecastOrchestrator {
       caches.match(url).then(function (response) {
         if (response) {
           response.json().then(function updateFromCache(json) {
-            var results = json.query.results;
+            const results = json.query.results;
             results.key = key;
             results.label = label;
             results.created = json.query.created;
-            app.updateForecastCard(results);
+            ForecastOrchestrator.updateForecastCard(results);
           });
         }
       });
@@ -33,16 +34,16 @@ class ForecastOrchestrator {
     request.onreadystatechange = function () {
       if (request.readyState === XMLHttpRequest.DONE) {
         if (request.status === 200) {
-          var response = JSON.parse(request.response);
-          var results = response.query.results;
+          const response = JSON.parse(request.response);
+          const results = response.query.results;
           results.key = key;
           results.label = label;
           results.created = response.query.created;
-          app.updateForecastCard(results);
+          ForecastOrchestrator.updateForecastCard(results);
         }
       } else {
         // Return the initial weather forecast since no data is available.
-        app.updateForecastCard(initialWeatherForecast);
+        ForecastOrchestrator.updateForecastCard(initialWeatherForecast);
       }
     };
     request.open('GET', url);

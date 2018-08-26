@@ -2,8 +2,7 @@ class MainController {
   constructor() {
     this.state = new StateService();
     this.dbPromise = DbService.openDatabase();
-    // this.forecastOrchestrator = new ForecastOrchestrator();
-    this.value = "Main controller here";
+    this.forecastOrchestrator = new ForecastOrchestrator();
   }
   static registerSW() {
     if ('serviceWorker' in navigator) {
@@ -22,13 +21,12 @@ class MainController {
       const keyIndex = selCitiesStore.index('label');
       return keyIndex.getAll();
     }).then(function (cities) {
-      const forecastOrchestrator = new ForecastOrchestrator();
       if (cities.length > 0) {
         cities.forEach(function (city) {
-          forecastOrchestrator.getForecast(city.key, city.label);
+          MainController.forecastOrchestrator.getForecast(city.key, city.label, MainController.state.initialWeatherForecast);
         });
       } else {
-        forecastOrchestrator.updateForecastCard(MainController.state.initialWeatherForecast);
+        MainController.forecastOrchestrator.updateForecastCard(MainController.state.initialWeatherForecast);
         MainController.state.selectedCities = [
           { key: MainController.state.initialWeatherForecast.key, label: MainController.state.initialWeatherForecast.label }
         ];
