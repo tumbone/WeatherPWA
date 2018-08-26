@@ -1,16 +1,16 @@
 class ViewService {
-  constructor() {
-    this.StateService = new StateService();
+  constructor(state) {
+    this.StateService = state;
   }
-  viewCardUpdate(data) {
-    var dataLastUpdated = new Date(data.created);
-    var sunrise = data.channel.astronomy.sunrise;
-    var sunset = data.channel.astronomy.sunset;
-    var current = data.channel.item.condition;
-    var humidity = data.channel.atmosphere.humidity;
-    var wind = data.channel.wind;
+  viewCardUpdate(data = this.StateService.initialWeatherForecast) {
+    const dataLastUpdated = new Date(data.created);
+    const sunrise = data.channel.astronomy.sunrise;
+    const sunset = data.channel.astronomy.sunset;
+    const current = data.channel.item.condition;
+    const humidity = data.channel.atmosphere.humidity;
+    const wind = data.channel.wind;
 
-    var card = this.StateService.visibleCards[data.key];
+    let card = this.StateService.visibleCards[data.key];
     if (!card) {
       card = this.StateService.cardTemplate.cloneNode(true);
       card.classList.remove('cardTemplate');
@@ -23,8 +23,8 @@ class ViewService {
     // Verifies the data provide is newer than what's already visible
     // on the card, if it's not bail, if it is, continue and update the
     // time saved in the card
-    var cardLastUpdatedElem = card.querySelector('.card-last-updated');
-    var cardLastUpdated = cardLastUpdatedElem.textContent;
+    const cardLastUpdatedElem = card.querySelector('.card-last-updated');
+    let cardLastUpdated = cardLastUpdatedElem.textContent;
     if (cardLastUpdated) {
       cardLastUpdated = new Date(cardLastUpdated);
       // Bail if the card has more recent data then the data
@@ -46,12 +46,12 @@ class ViewService {
     card.querySelector('.current .wind .value').textContent =
       Math.round(wind.speed);
     card.querySelector('.current .wind .direction').textContent = wind.direction;
-    var nextDays = card.querySelectorAll('.future .oneday');
-    var today = new Date();
+    const nextDays = card.querySelectorAll('.future .oneday');
+    let today = new Date();
     today = today.getDay();
-    for (var i = 0; i < 7; i++) {
-      var nextDay = nextDays[i];
-      var daily = data.channel.item.forecast[i];
+    for (let i = 0; i < 7; i++) {
+      const nextDay = nextDays[i];
+      const daily = data.channel.item.forecast[i];
       if (daily && nextDay) {
         nextDay.querySelector('.date').textContent =
           this.StateService.daysOfWeek[(i + today) % 7];

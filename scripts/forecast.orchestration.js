@@ -1,14 +1,14 @@
 'use strict'
 class ForecastOrchestrator {
-  constructor() {
-    this.viewService = new ViewService();
+  constructor(state) {
+    this.viewService = new ViewService(state);
+    this.StateService = state;
   }
 
   getForecast(key, label, initialWeatherForecast) {
     const ForecastOrchestrator = this;
     const statement = 'select * from weather.forecast where woeid=' + key;
-    const url = 'https://query.yahooapis.com/v1/public/yql?format=json&q=' +
-      statement;
+    const url = 'https://query.yahooapis.com/v1/public/yql?format=json&q=' + statement;
     // TODO add cache logic here
     if ('caches' in window) {
       /*
@@ -30,7 +30,7 @@ class ForecastOrchestrator {
     }
 
     // Fetch the latest data.
-    var request = new XMLHttpRequest();
+    const request = new XMLHttpRequest();
     request.onreadystatechange = function () {
       if (request.readyState === XMLHttpRequest.DONE) {
         if (request.status === 200) {
@@ -52,4 +52,11 @@ class ForecastOrchestrator {
   updateForecastCard(data) {
     this.viewService.viewCardUpdate(data);
   }
+  updateForecasts() {
+    const ForecastOrchestrator = this;
+    const keys = Object.keys(this.StateService.visibleCards);
+    keys.forEach(function (key) {
+      ForecastOrchestrator.getForecast(key);
+    });
+  };
 }

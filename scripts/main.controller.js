@@ -2,9 +2,9 @@ class MainController {
   constructor() {
     this.state = new StateService();
     this.dbPromise = DbService.openDatabase();
-    this.forecastOrchestrator = new ForecastOrchestrator();
+    this.forecastOrchestrator = new ForecastOrchestrator(this.state);
   }
-  static registerSW() {
+  registerSW() {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker
         .register('./sw.js')
@@ -47,4 +47,16 @@ class MainController {
       console.log('Cities added!')
     });
   }
+  // Toggles the visibility of the add new city dialog.
+  toggleAddDialog(visible) {
+    if (visible) {
+      this.state.addDialog.classList.add('dialog-container--visible');
+    } else {
+      this.state.addDialog.classList.remove('dialog-container--visible');
+    }
+  };
+
+
+
+
 } 
